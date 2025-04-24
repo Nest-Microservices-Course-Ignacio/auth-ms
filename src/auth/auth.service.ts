@@ -1,9 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { PrismaClient } from 'generated/prisma';
+import { RegisterDTO } from './dto/register.dto';
 
 @Injectable()
-export class AuthService {
-  create() {
-    return 'This action adds a new auth';
+export class AuthService extends PrismaClient implements OnModuleInit {
+  onModuleInit() {
+    this.$connect();
+    Logger.log('Prisma Client connected', 'AuthService');
+  }
+
+  create(data: RegisterDTO) {
+    return this.user.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      },
+    });
   }
 
   findAll() {

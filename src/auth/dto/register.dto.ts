@@ -1,4 +1,4 @@
-import { IsPhoneNumber, IsString } from 'class-validator';
+import { IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 import { LoginUserDTO } from './loginUser.dto';
 
 export class RegisterDTO extends LoginUserDTO {
@@ -7,8 +7,10 @@ export class RegisterDTO extends LoginUserDTO {
 
   @IsString()
   @IsPhoneNumber()
-  phone: string;
+  @IsOptional()
+  phone?: string;
 
   @IsString()
-  address: string;
+  @IsOptional()
+  address?: string;
 }
