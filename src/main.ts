@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 import { envs } from './config/envs';
+import { ExceptionFilter } from './common/exceptions/rcp-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -15,6 +16,8 @@ async function bootstrap() {
       },
     },
   );
+
+  app.useGlobalFilters(new ExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({

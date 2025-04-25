@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
 import { RegisterDTO } from './dto/register.dto';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService extends PrismaClient implements OnModuleInit {
@@ -9,14 +10,27 @@ export class AuthService extends PrismaClient implements OnModuleInit {
     Logger.log('Prisma Client connected', 'AuthService');
   }
 
-  create(data: RegisterDTO) {
-    return this.user.create({
+  async create(data: RegisterDTO) {
+    const userExists = await this.user.findUnique({
+      where: {
+        email: data.email,
+      },
+    });
+    if (userExists) {
+      throw new RpcException({
+        status: 409,
+        message: `User with email ${data.email} already exists`,
+      });
+    }
+
+    const newUser = await this.user.create({
       data: {
         name: data.name,
         email: data.email,
-        password: data.password,
+        password: data.password /*TODO: encrypt password */,
       },
     });
+    return { ...newUser, accessToken: 'ABC' };
   }
 
   findAll() {
