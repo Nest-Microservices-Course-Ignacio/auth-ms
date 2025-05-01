@@ -12,11 +12,11 @@ export class AuthController {
 
   @MessagePattern({ cmd: 'auth.register.user' })
   registerUser(@Payload() data: RegisterDTO) {
-    return this.authService.create(data);
+    return this.authService.register(data);
   }
   @MessagePattern({ cmd: 'auth.login.user' })
   loginUser(@Payload() data: LoginUserDTO) {
-    return { msg: 'user logged in successfully', data };
+    return this.authService.loginUser(data);
   }
 
   @MessagePattern({ cmd: 'auth.verify.user' })

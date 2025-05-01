@@ -1,17 +1,23 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { RpcException } from '@nestjs/microservices';
 import * as bcrypt from 'bcrypt';
 import { PrismaClient } from 'generated/prisma';
+import { LoginUserDTO } from './dto/loginUser.dto';
 import { RegisterDTO } from './dto/register.dto';
 
 @Injectable()
 export class AuthService extends PrismaClient implements OnModuleInit {
+  constructor(private jwtService: JwtService) {
+    super();
+  }
+
   onModuleInit() {
     this.$connect();
     Logger.log('Prisma Client connected', 'AuthService');
   }
 
-  async create(data: RegisterDTO) {
+  async register(data: RegisterDTO) {
     const userExists = await this.user.findUnique({
       where: {
         email: data.email,
@@ -23,11 +29,7 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         message: `User with email ${data.email} already exists`,
       });
     }
-
-    console.log(bcrypt.hashSync(data.password, 10));
-
     const hashedPassword = bcrypt.hashSync(data.password, 10);
-
     const newUser = await this.user.create({
       data: {
         name: data.name,
@@ -51,15 +53,40 @@ export class AuthService extends PrismaClient implements OnModuleInit {
     return `This action returns all auth`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+  async loginUser(data: LoginUserDTO) {
+    const { email, password } = data;
+    const existingUser = await this.user.findUnique({
+      where: { email },
+    });
 
-  update(id: number) {
-    return `This action updates a #${id} auth`;
-  }
+    if (!existingUser) {
+      throw new RpcException({
+        status: 401,
+        message: 'Invalid credentials.',
+      });
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    const isPasswordValid = bcrypt.compareSync(password, existingUser.password);
+
+    if (!isPasswordValid) {
+      throw new RpcException({
+        status: 401,
+        message: 'Invalid credentials.',
+      });
+    }
+    const formattedUser = {
+      id: existingUser.id,
+      email: existingUser.email,
+      name: existingUser.name,
+      phone: existingUser.phone,
+      address: existingUser.address,
+      createdAt: existingUser.createdAt,
+      updatedAt: existingUser.updatedAt,
+    };
+
+    return {
+      ...formattedUser,
+      accessToken: this.jwtService.sign(formattedUser),
+    };
   }
 }
