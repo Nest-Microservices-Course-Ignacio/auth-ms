@@ -9,7 +9,7 @@ import { envs } from 'src/config/envs';
     JwtModule.register({
       global: true,
       secret: envs.jwtConstant,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '3600s' },
     }),
   ],
   controllers: [AuthController],

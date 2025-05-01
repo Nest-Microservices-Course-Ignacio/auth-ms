@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaClient } from 'generated/prisma';
 import { LoginUserDTO } from './dto/loginUser.dto';
 import { RegisterDTO } from './dto/register.dto';
+import { AuthUser } from './interfaces/AuthUser.interface';
 
 @Injectable()
 export class AuthService extends PrismaClient implements OnModuleInit {
@@ -49,11 +50,25 @@ export class AuthService extends PrismaClient implements OnModuleInit {
     };
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  verifyToken(token: string): AuthUser {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const { iat, exp, ...user } = this.jwtService.verify(token);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return {
+        ...user,
+        accessToken: this.jwtService.sign(user),
+      };
+    } catch (error) {
+      Logger.error(error, this.constructor.name);
+      throw new RpcException({
+        status: 401,
+        message: 'Invalid Token.',
+      });
+    }
   }
 
-  async loginUser(data: LoginUserDTO) {
+  async loginUser(data: LoginUserDTO): Promise<AuthUser> {
     const { email, password } = data;
     const existingUser = await this.user.findUnique({
       where: { email },
