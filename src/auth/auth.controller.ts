@@ -1,9 +1,9 @@
 import { Controller, UseFilters } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { AuthService } from './auth.service';
-import { RegisterDTO } from './dto/register.dto';
-import { LoginUserDTO } from './dto/loginUser.dto';
 import { ExceptionFilter } from 'src/common/exceptions/rcp-exception.filter';
+import { AuthService } from './auth.service';
+import { LoginUserDTO } from './dto/loginUser.dto';
+import { RegisterDTO } from './dto/register.dto';
 
 @Controller()
 @UseFilters(new ExceptionFilter())

@@ -1,8 +1,8 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from 'generated/prisma';
-import * as bcrypt from 'bcrypt';
-import { RegisterDTO } from './dto/register.dto';
 import { RpcException } from '@nestjs/microservices';
+import * as bcrypt from 'bcrypt';
+import { PrismaClient } from 'generated/prisma';
+import { RegisterDTO } from './dto/register.dto';
 
 @Injectable()
 export class AuthService extends PrismaClient implements OnModuleInit {
