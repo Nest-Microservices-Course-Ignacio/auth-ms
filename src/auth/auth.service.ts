@@ -35,7 +35,16 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         password: hashedPassword,
       },
     });
-    return { ...newUser, accessToken: 'ABC' };
+    return {
+      id: newUser.id,
+      email: newUser.email,
+      name: newUser.name,
+      phone: newUser.phone,
+      address: newUser.address,
+      createdAt: newUser.createdAt,
+      updatedAt: newUser.updatedAt,
+      accessToken: 'ABC',
+    };
   }
 
   findAll() {
