@@ -16,6 +16,3 @@ steps:
         "push",
         "northamerica-south1-docker.pkg.dev/store-nest-ms/image-registry/auth-ms",
       ]
-
-options:
-  logging: CLOUD_LOGGING_ONLY
